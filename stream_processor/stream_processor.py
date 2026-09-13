@@ -1,6 +1,9 @@
-# StreamForge - Week 3
-# Stateful Stream Processing with Windowing,
-# RocksDB and Kafka Changelog Recovery
+ # StreamForge - Week 4
+# Stateful Stream Processing with:
+# 5-Minute Tumbling Windows
+# RocksDB Persistent State
+# Kafka Changelog Recovery
+# Prometheus Monitoring
 
 import json
 import time
@@ -12,12 +15,17 @@ from windowing import update_window
 from state_store import StateStore
 from changelog import ChangelogProducer
 from recovery import recover_state
+from metrics import MetricsManager
 
 
+# Kafka configuration
 BOOTSTRAP_SERVERS = "localhost:9092"
 INPUT_TOPIC = "truck-telemetry"
 CHANGELOG_TOPIC = "aggregation-changelog"
 CONSUMER_GROUP = "streamforge-week3"
+
+
+# Worker configuration
 WORKER_ID = os.getenv("WORKER_ID", "worker-default")
 
 STATE_DB_PATH = os.getenv(
@@ -30,7 +38,10 @@ class StreamProcessor:
 
     def __init__(self):
 
-        print("Starting StreamForge Week 3 processor...")
+        print("Starting StreamForge Week 4 processor...")
+
+        # Initialize Prometheus monitoring
+        self.metrics = MetricsManager(port=8000)
 
         # Initialize RocksDB state store
         self.state_store = StateStore(STATE_DB_PATH)
@@ -57,6 +68,8 @@ class StreamProcessor:
         print("Kafka consumer connected.")
         print("Input topic:", INPUT_TOPIC)
         print("Consumer group:", CONSUMER_GROUP)
+        print("Worker ID:", WORKER_ID)
+        print("State DB:", STATE_DB_PATH)
 
         # Recover state from local RocksDB
         self.state = self.state_store.get_all()
@@ -66,7 +79,7 @@ class StreamProcessor:
             len(self.state)
         )
 
-        # Recover latest state from Kafka changelog
+        # Recover state from Kafka changelog
         print()
         print("Starting Kafka state recovery...")
 
@@ -77,7 +90,7 @@ class StreamProcessor:
             len(kafka_state)
         )
 
-        # Merge Kafka recovered state into local state
+        # Merge Kafka recovered state into local RocksDB state
         for window_key, window_state in kafka_state.items():
 
             self.state[window_key] = window_state
@@ -127,8 +140,14 @@ class StreamProcessor:
 
     def process_event(self, event):
 
+        # Extract event timestamp
         timestamp = self.get_timestamp(event)
+
+        # Extract numeric value
         value = self.get_value(event)
+
+        # Update Prometheus metrics
+        self.metrics.record_event(timestamp)
 
         # Update 5-minute tumbling window
         window = update_window(
@@ -137,6 +156,7 @@ class StreamProcessor:
             value
         )
 
+        # Get window key
         window_key = str(window["window_start"])
 
         # Save latest state to RocksDB
@@ -151,6 +171,7 @@ class StreamProcessor:
             window
         )
 
+        # Display processing result
         print(
             f"Event processed | "
             f"window={window_key} | "
