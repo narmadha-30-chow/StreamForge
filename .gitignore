@@ -1,11 +1,21 @@
-venv/
-week2_env/
+# RocksDB state
+rocksdb_state/
+rocksdb_state_worker-default/
+rocksdb_state_worker1/
+rocksdb_state_worker2/
+# Python cache
 __pycache__/
 *.pyc
 
-frontend/node_modules/
-frontend/dist/
+# Virtual environments
+venv/
+week2_env/
 
-.env
-*.log
-.DS_Store
+# Node modules
+frontend/node_modules/
+
+# RocksDB state
+rocksdb_state/
+rocksdb_state_worker-default/
+rocksdb_state_worker1/
+rocksdb_state_worker2/
