@@ -41,3 +41,23 @@ The Prometheus metrics server was successfully started on port 8000. Telemetry e
 ## 6. Week 4 Result
 
 The Week 4 monitoring implementation successfully provides visibility into the StreamForge stream-processing workload. Event counts, processing lag, and processing rate can be monitored through the Prometheus metrics endpoint.
+Test-NetConnection localhost -Port 9092
+## 6. Monitoring Test Evidence
+
+The StreamForge Week 4 processor was executed successfully with Prometheus monitoring enabled.
+
+The Prometheus metrics endpoint was verified using:
+
+`http://localhost:8000/metrics`
+
+The following metrics were observed during testing:
+
+- `streamforge_events_processed_total`
+- `streamforge_processing_lag_seconds`
+- `streamforge_events_per_second`
+
+The metrics endpoint successfully returned the current monitoring values while Kafka telemetry events were being processed.
+
+## 7. Conclusion
+
+Week 4 successfully adds monitoring and performance visibility to the StreamForge stream-processing system. Prometheus provides real-time information about processed events, processing lag, and event-processing rate.
