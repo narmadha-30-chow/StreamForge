@@ -74,3 +74,9 @@ class StateStore:
         """
 
         self.db.close()
+# StreamForge - Week 3
+# RocksDB Persistent State Store
+#
+# Provides local persistent storage for stream-processing state.
+# Aggregation windows are saved to RocksDB so that state
+# can be recovered after worker restart or failure.
