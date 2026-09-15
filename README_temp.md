@@ -209,3 +209,32 @@ Readings: 5
 ## Author
 
 Developed as an academic project on distributed stream processing and Big Data technologies.
+## Week 4 – Monitoring and Performance Metrics
+
+Week 4 focuses on monitoring the StreamForge distributed stream-processing system using Prometheus.
+
+### Monitoring Features
+
+- Prometheus metrics integrated into the stream processor
+- Total events processed monitoring
+- Processing lag monitoring
+- Events-per-second monitoring
+- Metrics exposed through HTTP endpoint on port 8000
+
+### Implemented Metrics
+
+| Metric | Description |
+|---|---|
+| `streamforge_events_processed_total` | Total telemetry events processed |
+| `streamforge_processing_lag_seconds` | Current processing lag in seconds |
+| `streamforge_events_per_second` | Current stream processing rate |
+
+### Monitoring Endpoint
+
+The Prometheus metrics are available at:
+
+`http://localhost:8000/metrics`
+
+### Week 4 Result
+
+The StreamForge processor successfully processes Kafka telemetry events while exposing real-time monitoring metrics through Prometheus. Event count, processing lag, and processing rate can be monitored through the metrics endpoint.
