@@ -1,5 +1,13 @@
  # StreamForge - Week 4
-# Stateful Stream Processing with:
+# Stateful Stream Processing
+# StreamForge - Week 4
+# Main Stateful Stream Processor
+#
+# Consumes truck telemetry events from Kafka,
+# processes five-minute tumbling windows,
+# persists state using RocksDB,
+# publishes state to the Kafka changelog,
+# and exposes Prometheus monitoring metrics.
 # 5-Minute Tumbling Windows
 # RocksDB Persistent State
 # Kafka Changelog Recovery
