@@ -1,5 +1,10 @@
 # StreamForge - Week 3
 # Kafka Changelog State Recovery
+# StreamForge - Week 3
+# Kafka Changelog Recovery
+#
+# Replays the Kafka changelog and restores
+# the latest aggregation state after recovery.
 
 
 # Replays aggregation state from the Kafka changelog topic
