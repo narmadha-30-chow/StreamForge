@@ -1,0 +1,439 @@
+# StreamForge: Distributed Python Event Processor
+
+## 📌 Project Overview
+
+**StreamForge** is a distributed real-time event processing system designed to ingest and process truck telemetry data using Apache Kafka and Python-based stream processing.
+
+The system processes temperature readings generated from trucks, groups events into five-minute event-time windows, calculates aggregation statistics, maintains persistent state using RocksDB, provides state recovery through a Kafka changelog, and exposes monitoring metrics using Prometheus.
+
+---
+
+## 🎯 Problem Statement
+
+Modern transportation systems generate a large amount of real-time telemetry data from connected vehicles. Processing this data efficiently requires a distributed system capable of handling continuous event streams, maintaining state, recovering from worker failures, and monitoring processing performance.
+
+StreamForge addresses this requirement by building a distributed event-processing pipeline using Kafka, Python stream processing, RocksDB and Prometheus.
+
+---
+
+## 🏗️ System Architecture
+
+```text
+Truck Telemetry
+       │
+       ▼
+   Kafka Producer
+       │
+       ▼
+Apache Kafka
+truck-telemetry topic
+       │
+       ▼
+Stream Processor
+       │
+       ▼
+Filter Temperature > 0
+       │
+       ▼
+5-Minute Event-Time Window
+       │
+       ▼
+Count + Sum + Average
+       │
+       ├──────────────► RocksDB State
+       │
+       └──────────────► Kafka Changelog
+                              │
+                              ▼
+                           Recovery
+       
+       Stream Processor
+              │
+              ▼
+        Prometheus Metrics
+```
+
+---
+
+# 📅 Week 1 – Kafka Foundation
+
+## Objective
+
+The first week focused on establishing the Kafka-based event ingestion layer.
+
+## Implementation
+
+* Apache Kafka was configured using Docker.
+* A Kafka topic named `truck-telemetry` was created.
+* The topic was configured with multiple partitions.
+* A Python producer was implemented to generate truck telemetry events.
+* Events contain:
+
+  * Truck ID
+  * Temperature
+  * Timestamp
+* The producer publishes telemetry events to Kafka.
+
+## Technologies
+
+* Python
+* Apache Kafka
+* Docker
+* Confluent Kafka Python client
+
+## Week 1 Result
+
+The Kafka producer successfully generated truck telemetry events and published them to the `truck-telemetry` topic.
+
+---
+
+# 📅 Week 2 – Stream Processing
+
+## Objective
+
+The second week focused on processing the incoming Kafka stream and performing time-based aggregation.
+
+## Processing Pipeline
+
+```text
+Kafka
+  ↓
+Consume
+  ↓
+Filter Temperature > 0
+  ↓
+Map
+  ↓
+5-Minute Event-Time Window
+  ↓
+Aggregation
+```
+
+## Implementation
+
+* Kafka telemetry events are consumed by the stream processor.
+* Invalid temperature values are filtered.
+* Events are grouped using their event timestamps.
+* Five-minute tumbling windows are used.
+* Each window maintains:
+
+  * Event count
+  * Temperature sum
+  * Average temperature
+
+## Week 2 Result
+
+The stream processor successfully consumed telemetry events and calculated five-minute temperature aggregation values.
+
+---
+
+# 📅 Week 3 – Stateful Recovery
+
+## Objective
+
+Week 3 focused on maintaining persistent processing state and recovering state after worker failures.
+
+## RocksDB State Store
+
+RocksDB was integrated as the local state store.
+
+The state maintains aggregation information such as:
+
+```text
+window_start
+count
+sum
+average
+```
+
+## Kafka Changelog
+
+A Kafka topic named:
+
+```text
+aggregation-changelog
+```
+
+was used to store updated aggregation state.
+
+The changelog provides durable state information that can be used during worker recovery.
+
+## Worker Recovery
+
+The recovery workflow is:
+
+```text
+Worker Processing
+       ↓
+RocksDB State
+       ↓
+Kafka Changelog
+       ↓
+Worker Failure
+       ↓
+Worker Restart
+       ↓
+Changelog Replay
+       ↓
+State Recovery
+       ↓
+Continue Processing
+```
+
+## Fault Tolerance Test
+
+Two workers were configured using the same Kafka consumer group.
+
+During testing:
+
+1. Worker 1 was stopped intentionally.
+2. Kafka redistributed available partitions.
+3. Worker 2 continued processing.
+4. Worker 1 was restarted.
+5. Previous aggregation state was recovered.
+6. Processing continued with the recovered state.
+
+## Week 3 Result
+
+The system successfully demonstrated persistent state management and recovery after worker failure.
+
+---
+
+# 📅 Week 4 – Monitoring with Prometheus
+
+## Objective
+
+Week 4 focused on monitoring the performance of the stream-processing system.
+
+Prometheus was integrated into the StreamForge processor.
+
+## Implemented Metrics
+
+### 1. Events Processed
+
+```text
+streamforge_events_processed_total
+```
+
+Tracks the total number of telemetry events processed.
+
+### 2. Processing Lag
+
+```text
+streamforge_processing_lag_seconds
+```
+
+Measures the difference between the event timestamp and processing time.
+
+### 3. Events Per Second
+
+```text
+streamforge_events_per_second
+```
+
+Represents the current event-processing rate.
+
+## Monitoring Endpoint
+
+The metrics are exposed through:
+
+```text
+http://localhost:8000/metrics
+```
+
+## Monitoring Workflow
+
+```text
+Kafka Event
+    ↓
+Stream Processor
+    ↓
+Process Event
+    ↓
+Update Prometheus Metrics
+    ↓
+Metrics Endpoint
+```
+
+## Week 4 Result
+
+The Prometheus monitoring server successfully exposed event count, processing lag, and events-per-second metrics while Kafka telemetry events were being processed.
+
+---
+
+# 🛠️ Technology Stack
+
+| Technology   | Purpose                                 |
+| ------------ | --------------------------------------- |
+| Python       | Application and stream-processing logic |
+| Apache Kafka | Distributed event streaming             |
+| Bytewax      | Python stream processing                |
+| RocksDB      | Persistent local state                  |
+| Prometheus   | Monitoring and metrics                  |
+| Docker       | Kafka deployment                        |
+| Git/GitHub   | Version control                         |
+| PowerShell   | Development and execution               |
+
+---
+
+# 📂 Project Structure
+
+```text
+StreamForge/
+│
+├── producer/
+│   └── producer.py
+│
+├── stream_processor/
+│   ├── stream_processor.py
+│   ├── windowing.py
+│   ├── state_store.py
+│   ├── changelog.py
+│   ├── recovery.py
+│   ├── metrics.py
+│   └── test_changelog.py
+│
+├── docs/
+│   └── Week 4 monitoring documentation
+│
+├── frontend/
+│
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+```
+
+---
+
+# ▶️ How to Run
+
+## 1. Start Kafka
+
+Start Docker Desktop and verify the Kafka container:
+
+```powershell
+docker ps
+```
+
+The Kafka container should be running.
+
+---
+
+## 2. Start the Producer
+
+```powershell
+cd C:\Users\HP\OneDrive\Documents\StreamForge
+python producer\producer.py
+```
+
+The producer starts generating truck telemetry events.
+
+---
+
+## 3. Start the Stream Processor
+
+```powershell
+cd C:\Users\HP\OneDrive\Documents\StreamForge
+$env:WORKER_ID="week4_demo"
+python stream_processor\stream_processor.py
+```
+
+The processor consumes Kafka events and performs five-minute aggregation.
+
+---
+
+## 4. View Prometheus Metrics
+
+Open:
+
+```text
+http://localhost:8000/metrics
+```
+
+The following metrics can be observed:
+
+```text
+streamforge_events_processed_total
+streamforge_processing_lag_seconds
+streamforge_events_per_second
+```
+
+---
+
+# 🧪 Testing
+
+The project was tested for:
+
+* Kafka event ingestion
+* Five-minute event-time windowing
+* Temperature filtering
+* Aggregation
+* RocksDB state persistence
+* Kafka changelog generation
+* Worker failure and recovery
+* Prometheus metrics
+* Processing lag
+* Events-per-second monitoring
+
+---
+
+# 📊 Expected Processing Output
+
+```text
+Starting StreamForge Week 4 processor...
+Prometheus metrics server started on port 8000
+Kafka consumer connected.
+
+Metrics updated | lag=...s | events/sec=...
+
+Event processed | window=... | value=... |
+count=... | average=...
+```
+
+---
+
+# 🔐 Fault Tolerance
+
+StreamForge combines Kafka partitioning, RocksDB state persistence and Kafka changelog recovery to provide fault-tolerant stream processing.
+
+If a worker fails, Kafka can rebalance the consumer group and redistribute partitions. When the worker restarts, previously stored state can be recovered and processing can continue.
+
+---
+
+# 📈 Monitoring
+
+Prometheus provides visibility into the stream processor by monitoring:
+
+* Total events processed
+* Processing lag
+* Events processed per second
+
+This allows the performance of the distributed processing system to be observed during execution.
+
+---
+
+# 🚀 Future Enhancements
+
+* Increase the number of Kafka partitions and workers.
+* Add Grafana dashboards for visualization.
+* Improve event-time and late-event handling.
+* Add more telemetry metrics such as vehicle location and speed.
+* Deploy the complete system in a cloud environment.
+* Add automated performance and failure testing.
+
+---
+
+# ✅ Conclusion
+
+StreamForge demonstrates a distributed real-time event-processing pipeline for truck telemetry data.
+
+The project combines:
+
+**Apache Kafka** for distributed event ingestion,
+**Python stream processing** for real-time computation,
+**five-minute event-time windows** for aggregation,
+**RocksDB** for persistent state,
+**Kafka changelog** for recovery, and
+**Prometheus** for monitoring.
+
+The four-week implementation demonstrates important distributed-systems concepts including event streaming, partition-based processing, stateful computation, fault recovery and performance monitoring.
