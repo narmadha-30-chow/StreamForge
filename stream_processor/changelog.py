@@ -1,5 +1,10 @@
 # StreamForge - Week 3
 # Kafka Aggregation Changelog
+# StreamForge - Week 3/4
+# Kafka Changelog Producer
+#
+# Publishes aggregation state to Kafka
+# for state recovery and fault tolerance.
 
 import json
 from kafka import KafkaProducer
