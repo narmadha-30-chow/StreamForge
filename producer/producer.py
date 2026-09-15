@@ -69,3 +69,13 @@ finally:
 #
 # The producer is used to test real-time telemetry ingestion
 # into the StreamForge stream-processing pipeline.
+# StreamForge - Week 1
+# Kafka Telemetry Producer
+#
+# Generates simulated truck telemetry events
+# and publishes them to the truck-telemetry Kafka topic.
+#
+# Each event contains:
+# truck_id
+# temperature
+# timestamp
