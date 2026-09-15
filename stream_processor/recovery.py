@@ -1,6 +1,13 @@
 # StreamForge - Week 3
 # Kafka Changelog State Recovery
 
+
+# Replays aggregation state from the Kafka changelog topic
+# after a worker restart or failure.
+#
+# This module restores the latest window state so that
+# stream processing can continue without losing aggregation data.
+
 import json
 from kafka import KafkaConsumer, TopicPartition
 
