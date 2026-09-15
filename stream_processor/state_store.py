@@ -1,5 +1,10 @@
 # StreamForge - Week 3
 # RocksDB Persistent State Store
+# StreamForge - Week 3
+# RocksDB State Store
+#
+# Stores window aggregation state locally
+# and supports state persistence and recovery.
 
 import json
 import os
