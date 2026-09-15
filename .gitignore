@@ -21,3 +21,5 @@ rocksdb_state_worker1/
 rocksdb_state_worker2/
 rocksdb_state_week4/
 rocksdb_state_week4/
+# Week 4 RocksDB runtime state
+rocksdb_state_week4_new/
