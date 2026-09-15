@@ -51,3 +51,7 @@ def update_window(state, event_timestamp, value):
 # - event count
 # - total sum
 # - average temperature
+# StreamForge - Week 2
+# Five-Minute Tumbling Window
+# Groups telemetry events into fixed five-minute windows
+# using the event timestamp.
