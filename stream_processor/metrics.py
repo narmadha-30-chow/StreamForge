@@ -1,5 +1,10 @@
 # StreamForge - Week 4
 # Prometheus Monitoring Metrics
+# StreamForge - Week 4
+# Prometheus Metrics Manager
+#
+# Tracks processed events, processing lag,
+# and events processed per second.
 
 import time
 
